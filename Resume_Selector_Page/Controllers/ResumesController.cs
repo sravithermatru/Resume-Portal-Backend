@@ -132,50 +132,47 @@ namespace Resume_Selector_Page.Controllers
         [HttpPost("upload")]
         public async Task<IActionResult> UploadResume(IFormFile file)
         {
-            if (file == null || file.Length ==0 )
+            if (file == null || file.Length == 0)
             {
                 return BadRequest(" Invalid File Formate");
             }
 
             var containerName = "atsfilestorage";
             var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
-
             await containerClient.CreateIfNotExistsAsync();
-
             var blobClient = containerClient.GetBlobClient(file.FileName);
 
-            //
-            using(var stream = file.OpenReadStream())
+            using (var stream = file.OpenReadStream())
             {
                 await blobClient.UploadAsync(stream, overwrite: true);
             }
 
             // var tempFilePath = Path.GetTempFileName();
             var tempFilePath = Path.Combine(Path.GetTempPath(), file.FileName);
-            using (var Stream = file.OpenReadStream())
+            //    using (var Stream = file.OpenReadStream())
+
+            using (var fileStream = new FileStream(tempFilePath, FileMode.Create))
             {
-                using(var fileStream  = new FileStream(tempFilePath, FileMode.Create))
-                {
-                    await Stream.CopyToAsync(fileStream);
-                }
-                string content = ExtractTextFromPdf(tempFilePath);
+                //await Stream.CopyToAsync(fileStream);
+                await file.CopyToAsync(fileStream);
+            }
+            string content = ExtractTextFromPdf(tempFilePath);
+            System.IO.File.Delete(tempFilePath);
 
-                var genAiService = HttpContext.RequestServices.GetRequiredService<GenAi_Service>();
-                //var summary = await genAiService.SummarizeTextAsync(content);
+            var genAiService = HttpContext.RequestServices.GetRequiredService<GenAi_Service>();
+            var summary = await genAiService.SummarizeTextAsync(content);
 
-                var resume = new Resume //ceate an object
-                {
-                    FileName = file.FileName,
-                    FilePath = blobClient.Uri.ToString(),
-                    Content = content,
-                   // Summary = summary
-                };
+            var resume = new Resume //ceate an object
+            {
+                FileName = file.FileName,
+                FilePath = blobClient.Uri.ToString(),
+                Content = content,
+                Summary = summary
+            };
 
-                    _context.ResumesData.Add(resume);
-                await _context.SaveChangesAsync();
+            _context.ResumesData.Add(resume);
+            await _context.SaveChangesAsync();
 
-                System.IO.File.Delete(tempFilePath);
-            }           
             return Ok();
         }
 
