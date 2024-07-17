@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\Uploads\2019800_Resume.pdf" />
+    <Content Remove="wwwroot\Uploads\Karthika V_2135623_Resume.pdf" />
+    <Content Remove="wwwroot\Uploads\MangeshPatanker31_2Resume_ 2.pdf" />
+    <Content Remove="wwwroot\Uploads\Megha Malusare_resume1 6.pdf" />
+    <Content Remove="wwwroot\Uploads\Rooshmica_Resume.pdf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.20.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.20" />
+    <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.20" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.18" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.20" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.20">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="PdfPig" Version="0.1.8" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\Uploads\2019800_Resume.pdf" />
+    <None Include="wwwroot\Uploads\Karthika V_2135623_Resume.pdf" />
+    <None Include="wwwroot\Uploads\MangeshPatanker31_2Resume_ 2.pdf" />
+    <None Include="wwwroot\Uploads\Megha Malusare_resume1 6.pdf" />
+    <None Include="wwwroot\Uploads\Rooshmica_Resume.pdf" />
+  </ItemGroup>
+
+</Project>
