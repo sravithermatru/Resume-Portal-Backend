@@ -15,6 +15,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddHttpClient<GenAi_Service>();
+builder.Services.AddScoped<GenAi_Service>();
+builder.Services.Configure<GenAi_Service>(builder.Configuration.GetSection("GenAI"));
+
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -30,7 +35,7 @@ builder.Services.AddSingleton(x =>
 IFileProvider fileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory()));
 builder.Services.AddSingleton<IFileProvider>(fileProvider);
 
-builder.Services.AddSingleton<GenAi_Service>();
+
 
 
 //addconncetion string
@@ -96,6 +101,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+else
+{
+    app.UseExceptionHandler("Home/Error");
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
