@@ -160,7 +160,7 @@ namespace Resume_Selector_Page.Controllers
                 }
                 string content = ExtractTextFromPdf(tempFilePath);
 
-                //var genAiService = HttpContext.RequestServices.GetRequiredService<GenAi_Service>();
+                var genAiService = HttpContext.RequestServices.GetRequiredService<GenAi_Service>();
                 //var summary = await genAiService.SummarizeTextAsync(content);
 
                 var resume = new Resume //ceate an object
