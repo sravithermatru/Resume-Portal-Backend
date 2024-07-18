@@ -1,9 +1,11 @@
-﻿using Azure.Storage.Blobs;
+﻿using Aspose.Words;
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.VisualBasic;
 using Resume_Selector_Page.Data;
 using Resume_Selector_Page.Models;
 using Resume_Selector_Page.Services;
@@ -156,24 +158,44 @@ namespace Resume_Selector_Page.Controllers
                 //await Stream.CopyToAsync(fileStream);
                 await file.CopyToAsync(fileStream);
             }
-            string content = ExtractTextFromPdf(tempFilePath);
+
+            //change for Docx
+            string content = string.Empty;
+
+            if (Path.GetExtension(tempFilePath).Equals(".pdf", StringComparison.OrdinalIgnoreCase))
+            {
+                content = ExtractTextFromPdf(tempFilePath);
+            }
+            else if (Path.GetExtension(tempFilePath).Equals(".doc", StringComparison.OrdinalIgnoreCase) ||
+                     Path.GetExtension(tempFilePath).Equals(".docx", StringComparison.OrdinalIgnoreCase))
+            {
+                content = ExtractTextFromWord(tempFilePath);
+            }
+            else
+            {
+                return BadRequest("Unsupported file format.");
+            }
+
+
+
+           // string content = ExtractTextFromPdf(tempFilePath);
             System.IO.File.Delete(tempFilePath);
 
-            var genAiService = HttpContext.RequestServices.GetRequiredService<GenAi_Service>();
-            var summary = await genAiService.SummarizeTextAsync(content);
+            //var genAiService = HttpContext.RequestServices.GetRequiredService<GenAi_Service>();
+            //var summary = await genAiService.SummarizeTextAsync(content);
 
             var resume = new Resume //ceate an object
             {
                 FileName = file.FileName,
                 FilePath = blobClient.Uri.ToString(),
                 Content = content,
-                Summary = summary
+                Summary = "summary"
             };
 
             _context.ResumesData.Add(resume);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok("File uploaded and processed successfully.");
         }
 
         private string ExtractTextFromPdf(String filePath)
@@ -189,6 +211,12 @@ namespace Resume_Selector_Page.Controllers
             }
         }
 
+        private string ExtractTextFromWord(string filePath)
+        {
+            var document = new Aspose.Words.Document(filePath);
+            return document.ToString(SaveFormat.Text);
+        }
+
 
         [HttpGet("search")]
         public async Task<IActionResult> Search(string query)
@@ -199,7 +227,12 @@ namespace Resume_Selector_Page.Controllers
                 return BadRequest("No search criteria provided");
             }
 
-            var searchTerms = query.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            //changes for {,/' '} adding
+            var delimiters = new[] { ',', '/', ' ' };
+
+
+
+            var searchTerms = query.Split(delimiters, StringSplitOptions.RemoveEmptyEntries)
                 .Select(term => term.Trim())
                 .ToArray();
 
